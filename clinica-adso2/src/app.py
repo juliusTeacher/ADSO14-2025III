@@ -9,7 +9,7 @@ app = Flask(__name__)
 def bd_conexion():
     try:
         if 'conexion' not in g:
-            g.conexion = sqlite3.connect("C:/Users/Julio/Desktop/clinica-adso/database/hospital.db")
+            g.conexion = sqlite3.connect("..\\clinica-adso2\\database\\hospital.db")
         return g.conexion
     except Exception :
         return 'No hay conexión con la base de datos'
@@ -107,6 +107,35 @@ def registrar_usuario():
     except Exception:
         return jsonify({'Mensaje': "Error"})
     
-
+@app.route('/usuarios/<int:id_usuario>', methods=['PUT', 'PATCH'])
+def actualizar_usuario(id_usuario):
+    try:
+        conexion = bd_conexion()
+        cursor = conexion.cursor()
+        sqlString = """UPDATE tblUsuarios SET idTipoUsuario={0},Nombre='{1}',Apellido='{2}',FechaNacimiento='{3}',Sexo='{4}',TipoIdentificacion='{5}',NumIdentificacion={6},idEspecialidad={7},Consultorio={8},Direccion='{9}',Telefono={10},Correo='{11}',Password='{12}'
+        WHERE idUsuario='{13}'""".format(request.json['idTipoUsuario'],request.json['Nombre'], 
+                                         request.json['Apellido'], request.json['FechaNacimiento'], request.json['Sexo'],
+                                         request.json['TipoIdentificacion'], request.json['NumIdentificacion'],
+                                         request.json['idEspecialidad'],request.json['Consultorio'],
+                                         request.json['Direccion'], request.json['Telefono'], 
+                                         request.json['Correo'],request.json['Password'],id_usuario)
+        cursor.execute(sqlString)
+        conexion.commit()
+        return({'Mensaje': "Usuario actualizado"})
+    except Exception:
+        return jsonify({'Mensaje': "Error"})
+    
+@app.route('/usuarios/<int:id_usuario>', methods=['DELETE'])
+def eliminar_usuario(id_usuario):
+    try:
+        conexion = bd_conexion()
+        cursor = conexion.cursor()
+        sqlString ="DELETE FROM tblUsuarios WHERE idUsuario = '{0}'".format(id_usuario)
+        cursor.execute(sqlString)
+        conexion.commit()
+        return jsonify({'Mensaje': "Usuario eliminado"})
+    except Exception:
+        return jsonify({'Mensaje': 'Error'})
+    
 if (__name__ == '__main__'):
     app.run(debug=True)
