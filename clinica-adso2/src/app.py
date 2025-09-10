@@ -9,10 +9,12 @@ app = Flask(__name__)
 def bd_conexion():
     try:
         if 'conexion' not in g:
-            g.conexion = sqlite3.connect("..\\clinica-adso2\\database\\hospital.db")
+            g.conexion = sqlite3.connect(
+                "..\\clinica-adso\\database\\hospital.db")
         return g.conexion
-    except Exception :
+    except Exception:
         return 'No hay conexión con la base de datos'
+
 
 def cerrar_bd():
     conexion = g.pop('conexion', None)
@@ -20,10 +22,10 @@ def cerrar_bd():
         conexion.close()
 
 
-
 @app.route('/')
 def index():
     return '<h1>Utilizando Flask para el sistema Hospital</h1>'
+
 
 @app.route('/usuarios', methods=['GET'])
 def listar_usuarios():
@@ -33,14 +35,14 @@ def listar_usuarios():
         cursor = conexion.cursor()
         cursor.execute(sqlString)
         datos = cursor.fetchall()
-        #print(datos)
-        #return 'Usuarios en lista'
+        # print(datos)
+        # return 'Usuarios en lista'
         usuarios = []
         for fila in datos:
-            user = {'idUsuario': fila[0], 
-                    'idTipoUsuario': fila[1], 
-                    'Nombre': fila[2], 
-                    'Apellido': fila[3], 
+            user = {'idUsuario': fila[0],
+                    'idTipoUsuario': fila[1],
+                    'Nombre': fila[2],
+                    'Apellido': fila[3],
                     'FechaNacimiento': fila[4],
                     'Sexo': fila[5],
                     'TipoIdentificacion': fila[6],
@@ -56,20 +58,22 @@ def listar_usuarios():
         return jsonify({'usuarios': usuarios, 'mensaje': "Usuarios en lista"})
     except Exception:
         return jsonify({'mensaje': "Error"})
-    
+
+
 @app.route('/usuarios/<int:id_usuario>', methods=['GET'])
 def listar_usuarios_id(id_usuario):
     try:
         conexion = bd_conexion()
         cursor = conexion.cursor()
-        sqlString = "SELECT * FROM tblUsuarios WHERE idUsuario = '{0}'".format(id_usuario)
+        sqlString = "SELECT * FROM tblUsuarios WHERE idUsuario = '{0}'".format(
+            id_usuario)
         cursor.execute(sqlString)
         datos = cursor.fetchone()
         if datos != None:
-            user = {'idUsuario': datos[0], 
-                    'idTipoUsuario': datos[1], 
-                    'Nombre': datos[2], 
-                    'Apellido': datos[3], 
+            user = {'idUsuario': datos[0],
+                    'idTipoUsuario': datos[1],
+                    'Nombre': datos[2],
+                    'Apellido': datos[3],
                     'FechaNacimiento': datos[4],
                     'Sexo': datos[5],
                     'TipoIdentificacion': datos[6],
@@ -87,6 +91,7 @@ def listar_usuarios_id(id_usuario):
     except Exception:
         return jsonify({'mensaje': "Error"})
 
+
 @app.route('/usuarios', methods=['POST'])
 def registrar_usuario():
     try:
@@ -94,34 +99,36 @@ def registrar_usuario():
         cursor = conexion.cursor()
         sqlString = """INSERT INTO tblUsuarios (idUsuario, idTipoUsuario, Nombre, Apellido, FechaNacimiento, Sexo, TipoIdentificacion, NumIdentificacion, idEspecialidad, Consultorio, Direccion, Telefono, Correo, Password) 
         VALUES({0},{1},'{2}','{3}','{4}','{5}','{6}',{7},{8},{9},'{10}',{11},'{12}','{13}')""".format(request.json['idUsuario'], request.json['idTipoUsuario'],
-                                                                                              request.json['Nombre'], request.json['Apellido'],
-                                                                                              request.json['FechaNacimiento'], request.json['Sexo'],
-                                                                                              request.json['TipoIdentificacion'], request.json['NumIdentificacion'],
-                                                                                              request.json['idEspecialidad'], request.json['Consultorio'],
-                                                                                              request.json['Direccion'], request.json['Telefono'], 
-                                                                                              request.json['Correo'],request.json['Password'])
+                                                                                                      request.json['Nombre'], request.json['Apellido'],
+                                                                                                      request.json['FechaNacimiento'], request.json['Sexo'],
+                                                                                                      request.json['TipoIdentificacion'], request.json['NumIdentificacion'],
+                                                                                                      request.json['idEspecialidad'], request.json['Consultorio'],
+                                                                                                      request.json['Direccion'], request.json['Telefono'],
+                                                                                                      request.json['Correo'], request.json['Password'])
         cursor.execute(sqlString)
         conexion.commit()
-        #print(request.json)
+        # print(request.json)
         return jsonify({'Mensaje': "Usuario registrado"})
     except Exception:
         return jsonify({'Mensaje': "Error"})
-    
+
+
 @app.route('/usuarios/<int:id_usuario>', methods=['PUT', 'PATCH'])
 def actualizar_usuario(id_usuario):
     try:
         conexion = bd_conexion()
         cursor = conexion.cursor()
-        sqlString = """UPDATE tblUsuarios SET idTipoUsuario={0},Nombre='{1}',Apellido='{2}',FechaNacimiento='{3}',Sexo='{4}',TipoIdentificacion='{5}',NumIdentificacion={6},idEspecialidad={7},Consultorio={8},Direccion='{9}',Telefono={10},Correo='{11}',Password='{12}'
-        WHERE idUsuario='{13}'""".format(request.json['idTipoUsuario'],request.json['Nombre'], 
-                                         request.json['Apellido'], request.json['FechaNacimiento'], request.json['Sexo'],
-                                         request.json['TipoIdentificacion'], request.json['NumIdentificacion'],
-                                         request.json['idEspecialidad'],request.json['Consultorio'],
-                                         request.json['Direccion'], request.json['Telefono'], 
-                                         request.json['Correo'],request.json['Password'],id_usuario)
+        sqlString = """UPDATE tblUsuarios SET idTipoUsuario={0}, Nombre='{1}', Apellido='{2}', FechaNacimiento='{3}', Sexo='{4}', 
+        TipoIdentificacion='{5}', NumIdentificacion={6}, idEspecialidad={7}, Consultorio={8}, Direccion='{9}', Telefono={10},
+        Correo='{11}', Password='{12}' WHERE idUsuario = '{13}'""".format(request.json['idTipoUsuario'],request.json['Nombre'], request.json['Apellido'],
+                                                                         request.json['FechaNacimiento'], request.json['Sexo'],
+                                                                         request.json['TipoIdentificacion'], request.json['NumIdentificacion'],
+                                                                         request.json['idEspecialidad'], request.json['Consultorio'],
+                                                                         request.json['Direccion'], request.json['Telefono'],
+                                                                         request.json['Correo'], request.json['Password'],id_usuario)
         cursor.execute(sqlString)
         conexion.commit()
-        return({'Mensaje': "Usuario actualizado"})
+        return jsonify({'Mensaje': "Usuario actualizado"})
     except Exception:
         return jsonify({'Mensaje': "Error"})
     
@@ -130,12 +137,32 @@ def eliminar_usuario(id_usuario):
     try:
         conexion = bd_conexion()
         cursor = conexion.cursor()
-        sqlString ="DELETE FROM tblUsuarios WHERE idUsuario = '{0}'".format(id_usuario)
+        sqlString = "DELETE FROM tblUsuarios WHERE idUsuario = '{0}'".format(id_usuario)
         cursor.execute(sqlString)
         conexion.commit()
         return jsonify({'Mensaje': "Usuario eliminado"})
     except Exception:
-        return jsonify({'Mensaje': 'Error'})
+        return jsonify({'Mensaje': "Error"})
     
+#Obtener historia clinica
+@app.route('/historia/<int:cedula>',methods=['GET'])
+def consultar_historiaC(cedula):
+    try:
+        conexion = bd_conexion()
+        cursor = conexion.cursor()
+        sqlString = "SELECT A.idHistoriaClinica, A.Paciente, A.HistoriaC FROM tblHistoriaClinica A JOIN tblUsuarios B ON A.Paciente = B.idUsuario WHERE B.NumIdentificacion = '{0}'".format(cedula)
+        cursor.execute(sqlString)
+        datos = cursor.fetchall()
+        historiaClinica = []
+        for fila in datos:
+            historia = {    'idHistoriaClinica': fila[0],
+                            'Paciente': fila[1],
+                            'HistoriaC': fila[2]
+                        }
+            historiaClinica.append(historia)
+        return jsonify({'usuarios': historiaClinica, 'mensaje': "Historia Clinica"})
+    except Exception:
+        return jsonify({'Mensaje': "Error"})
+
 if (__name__ == '__main__'):
     app.run(debug=True)
