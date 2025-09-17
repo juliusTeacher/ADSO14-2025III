@@ -1,0 +1,13 @@
+antiorm==1.2.1
+blinker==1.9.0
+click==8.2.1
+colorama==0.4.6
+db==0.1.1
+db-sqlite3==0.0.1
+flash==1.0.3
+Flask==3.1.2
+itsdangerous==2.2.0
+Jinja2==3.1.6
+MarkupSafe==3.0.2
+setuptools==80.9.0
+Werkzeug==3.1.3
